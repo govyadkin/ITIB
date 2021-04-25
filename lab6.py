@@ -2,15 +2,15 @@ import numpy as np
 from tkinter import *
 
 
-def evclid(a, b):
+def euclid(a, b):
     return np.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
 
-def manfatan(a, b):
+def manhattan(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def num_circule(x, y, fu):
+def num_circle(x, y, fu):
     min = fu(x, y[0])
     num = 0
     for i, v in enumerate(y):
@@ -20,7 +20,7 @@ def num_circule(x, y, fu):
     return num
 
 
-def mudian(y):
+def median(y):
     y.sort()
     if (len(y) % 2) == 1:
         return y[int((len(y) - 1) / 2)]
@@ -30,15 +30,22 @@ def mudian(y):
         return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
 
 
-def body(x, y, fu):
+def epohe(x, y, fu, num):
     y_new = [[] for i in range(len(y))]
 
     for i in x:
-        y_new[num_circule(i, y, fu)].append(i)
+        y_new[num_circle(i, y, fu)].append(i)
+
+    print("Эпоха №", num)
+    print("Центр  --  сопоставимые точки")
+    for i in range(len(y)):
+        print(y[i], "  --  ", y_new[i])
 
     for i in range(len(y)):
         if len(y_new[i]) != 0:
-            y[i] = mudian(y_new[i])
+            y[i] = median(y_new[i])
+
+    print("Новые центры: ", y)
 
     return y
 
@@ -56,58 +63,49 @@ def main():
                width=canvas_width,
                height=canvas_height)
 
+    def drow(color, size, x_print, y_print):
+        x1, y1 = (x_print - 1), (y_print - 1)
+        x2, y2 = (x_print + size), (y_print + size)
+        w.create_oval(x1, y1, x2, y2, fill=color)
+
     def yy(event):
-        python_green = "#00ff00"
-        x1, y1 = (event.x - 1), (event.y - 1)
-        x2, y2 = (event.x + 5), (event.y + 5)
-        w.create_oval(x1, y1, x2, y2, fill=python_green)
+        drow("#00ff00", 5, event.x, event.y)
         print(event.x, event.y)
         y.append([event.x, event.y])
 
     def xx(event):
-        python_green = "#cccccc"
-        x1, y1 = (event.x - 1), (event.y - 1)
-        x2, y2 = (event.x + 1), (event.y + 1)
-        w.create_oval(x1, y1, x2, y2, fill=python_green)
+        drow("#cccccc", 1, event.x, event.y)
         print("-", event.x, event.y)
         x.append([event.x, event.y])
-        # w.delete("all")
+
+    def body(xn, yn, fun, color):
+        i = 1
+        while True:
+            y2 = epohe(xn, [i for i in yn], fun, i)
+            if y2 == yn:
+                break
+            yn = [i for i in y2]
+            i += 1
+
+        for i in yn:
+            drow(color, 5, i[0], i[1])
 
     def run(event):
         nonlocal x
         nonlocal y
-        xn = x
-        yn = y
-        print(x)
-        print(y)
+        print("Исходные данны:")
+        print("X: ", x)
+        print("Y: ", y, "\n")
 
-        while True:
-            y2 = body(x, y, evclid)
-            if y2 == y:
-                break
-            y = y2
+        yn = [i for i in y]
 
-        print(x)
-        for i in y:
-            python_green = "#ff0000"
-            x1, y1 = (i[0] - 1), (i[1] - 1)
-            x2, y2 = (i[0] + 5), (i[1] + 5)
-            w.create_oval(x1, y1, x2, y2, fill=python_green)
-        print(y)
+        print("По Евклиду:")
+        body(x, y, euclid, "#ff0000")
+        print()
 
-        while True:
-            y2 = body(xn, yn, manfatan)
-            if y2 == yn:
-                break
-            yn = y2
-
-        print(xn)
-        for i in yn:
-            python_green = "#0000ff"
-            x1, y1 = (i[0] - 1), (i[1] - 1)
-            x2, y2 = (i[0] + 5), (i[1] + 5)
-            w.create_oval(x1, y1, x2, y2, fill=python_green)
-        print(yn)
+        print("По Манхетану:")
+        body(x, yn, manhattan, "#0000ff")
+        print()
 
     w.pack(expand=YES, fill=BOTH)
     w.bind('<Button-1>', xx)
@@ -115,7 +113,7 @@ def main():
     w.bind('<Button-3>', yy)
     w.bind()
 
-    message = Label(master, text="Press and Drag the mouse to draw")
+    message = Label(master, text="ПКМ - y // ЛКМ - x // колесеко - run")
     message.pack(side=BOTTOM)
 
     mainloop()
