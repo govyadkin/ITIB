@@ -20,14 +20,20 @@ def num_circle(x, y, fu):
     return num
 
 
+def average(a, b):
+    return (a + b) / 2
+
+
 def median(y):
-    y.sort()
+    a = [i[0] for i in y]
+    b = [i[1] for i in y]
+    a.sort()
+    b.sort()
     if (len(y) % 2) == 1:
-        return y[int((len(y) - 1) / 2)]
+        return [a[int((len(y) - 1) / 2)], b[int((len(y) - 1) / 2)]]
     else:
-        a = y[int(len(y) / 2)]
-        b = y[int((len(y) - 2) / 2)]
-        return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
+        return [average(a[int(len(y) / 2)], a[int((len(y) - 2) / 2)]),
+                average(b[int(len(y) / 2)], b[int((len(y) - 2) / 2)])]
 
 
 def epohe(x, y, fu, num):
@@ -93,7 +99,8 @@ def main():
     def run(event):
         nonlocal x
         nonlocal y
-        print("Исходные данны:")
+        print("Исходные данные:")
+
         print("X: ", x)
         print("Y: ", y, "\n")
 
@@ -103,7 +110,7 @@ def main():
         body(x, y, euclid, "#ff0000")
         print()
 
-        print("По Манхетану:")
+        print("По Манхэттену:")
         body(x, yn, manhattan, "#0000ff")
         print()
 
@@ -113,7 +120,7 @@ def main():
     w.bind('<Button-3>', yy)
     w.bind()
 
-    message = Label(master, text="ПКМ - y // ЛКМ - x // колесеко - run")
+    message = Label(master, text="ПКМ - y // ЛКМ - x // колесико - run")
     message.pack(side=BOTTOM)
 
     mainloop()
