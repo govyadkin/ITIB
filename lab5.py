@@ -1,5 +1,25 @@
 import random
 import numpy as np
+from tkinter import *
+
+
+class Checkbar(Frame):
+    def __init__(self, parent=None, picks=[], vares=[], side=LEFT, anchor=W):
+        Frame.__init__(self, parent)
+        self.vars = []
+        for i, pick in enumerate(picks):
+            var = IntVar()
+            var.set(vares[i])
+            chk = Checkbutton(self, text=pick, variable=var)
+            chk.pack(side=side, anchor=anchor, expand=YES)
+            self.vars.append(var)
+
+    def state(self):
+        return map((lambda var: var.get()), self.vars)
+
+    def set(self, el):
+        for i in range(len(self.vars)):
+            self.vars[i].set(el[i])
 
 
 class Lab5:
@@ -102,10 +122,44 @@ def main():
         lab.print_num(i, lab.final_conclusion(i))
         print("---------------------------")
 
+    print("Поврежденный тест")
     for i in symbols:
         vec = get_vec(i)
         lab.print_num(vec, lab.final_conclusion(vec))
         print("---------------------------")
+
+    root = Tk()
+    mas = []
+    for i in range(height):
+        mas += [Checkbar(root, [''] * width, [0] * width)]
+        mas[i].pack(side=TOP)
+
+    def allstates():
+        res = [list(i.state()) for i in mas]
+        res2 = []
+        for i in range(len(res[0])):
+            for j in res:
+                if j[i] == 0:
+                    res2 += [-1]
+                else:
+                    res2 += [1]
+
+        resn = lab.final_conclusion(res2)
+        lab.print_num(res2, resn)
+        mas2 = []
+
+        for i in range(height):
+            s = []
+            for j in range(width):
+                if resn[i + j * height] == 1:
+                    s += [1]
+                else:
+                    s += [0]
+            mas2 += [Checkbar(root, [''] * width, s)]
+            mas2[i].pack(side=TOP)
+
+    Button(root, text='Run', command=allstates).pack(side=RIGHT)
+    root.mainloop()
 
 
 main()
